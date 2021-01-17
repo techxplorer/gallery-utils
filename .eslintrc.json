@@ -1,0 +1,41 @@
+{
+  "env": {
+    "es2021": true,
+    "node": true,
+    "mocha": true
+  },
+  "plugins": [
+    "mocha",
+    "import",
+    "jsdoc"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "jquery",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:mocha/recommended",
+    "plugin:jsdoc/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": [
+      "error",
+      2
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "jsdoc/check-indentation": 1,
+    "jsdoc/check-line-alignment": 1,
+    "jsdoc/require-description": 1,
+    "jsdoc/require-description-complete-sentence": 1,
+    "jsdoc/require-file-overview": 1,
+    "jsdoc/require-throws": 1,
+    "strict": 1
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "name": "@techxplprer/gallery-utils",
+  "version": "1.0.0",
+  "description": "A CLI app that helps build my photo gallery website",
+  "main": "index.js",
+  "bin": {
+    "gallery-utils": "bin/index.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "mocha",
+    "lint": "eslint ./"
+  },
+  "author": "Corey Wallis <corey@techxplorer.com> (https://techxplorer.com)",
+  "license": "MIT",
+  "homepage": "https://github.com/techxplorer/gallery-utils/blob/main/README.md",
+  "repository": "https://github.com/techxplorer/gallery-utils",
+  "private": true,
+  "mocha": {
+    "recursive": true
+  },
+  "devDependencies": {
+    "eslint": "^7.16.0",
+    "eslint-config-jquery": "^3.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsdoc": "^31.0.3",
+    "eslint-plugin-mocha": "^8.0.0",
+    "mocha": "^8.2.1",
+    "rimraf": "^3.0.2"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "chalk": "^4.1.0",
+    "commander": "^6.2.1",
+    "exifreader": "^3.13.0",
+    "exiftool-vendored": "^13.1.0",
+    "fast-glob": "^3.2.4",
+    "iconv": "^3.0.0",
+    "log-symbols": "^4.0.0",
+    "luxon": "^1.25.0",
+    "pretty-ms": "^7.0.1"
+  }
+}
