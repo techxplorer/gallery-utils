@@ -1,6 +1,6 @@
 {
   "name": "@techxplprer/gallery-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI app that helps build my photo gallery website",
   "main": "index.js",
   "bin": {
@@ -34,7 +34,7 @@
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "chalk": "^4.1.0",
-    "commander": "^6.2.1",
+    "commander": "^7.0.0",
     "exifreader": "^3.13.0",
     "exiftool-vendored": "^13.1.0",
     "fast-glob": "^3.2.4",
