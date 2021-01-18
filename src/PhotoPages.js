@@ -210,7 +210,15 @@ export default class PhotoPages {
       const tags = ExifReader.load( fileData, { expanded: true } );
 
       if ( tags.exif.ImageDescription.description !== undefined ) {
-        tagMap.set( "title", tags.exif.ImageDescription.description );
+        tagMap.set(
+          "title",
+          tags.exif.ImageDescription.description
+        );
+
+        tagMap.set(
+          "tags",
+          this.getTags( tags.exif.ImageDescription.description )
+        );
       }
 
       if ( tags.exif.DateTime.description !== undefined ) {
@@ -259,6 +267,44 @@ export default class PhotoPages {
 
     return `+++\n${tomlString}+++\n`;
 
+  }
+
+  /**
+   * Get a list of tags from a photo description.
+   *
+   * @param {string} photoDescription The description of the photo.
+   * @param {boolean} stripHash A boolean flag to strip the hashes from tags or not.
+   *
+   * @returns {Array} An array of tags found in the description.
+   *
+   * @throws {TypeError} If the parameters do not pass validation.
+   */
+  getTags( photoDescription, stripHash = true ) {
+    if ( !photoDescription || typeof photoDescription !== "string" ) {
+      throw new TypeError( "photoDescription parameter is required and must be a string" );
+    }
+
+    if ( typeof stripHash !== "boolean" ) {
+      throw new TypeError( "stripHash parameter is required and must be a boolean" );
+    }
+
+    const tagsRegEx = new RegExp( "#+([a-zA-Z0-9_]+)", "g" );
+
+    let matches = photoDescription.matchAll( tagsRegEx );
+
+    let tags = new Array();
+
+    if ( stripHash === true ) {
+      for ( const match of matches ) {
+        tags.push( match[ 1 ] );
+      }
+    } else {
+      for ( const match of matches ) {
+        tags.push( match[ 0 ] );
+      }
+    }
+
+    return tags;
   }
 
   /**

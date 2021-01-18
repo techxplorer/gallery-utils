@@ -33,6 +33,30 @@ const testPhotoPath = path.join(
   "./albums/diy-projects/20200830-021808+0000-ig.jpg"
 );
 
+const expectedExifKeys = [
+  "title",
+  "date",
+  "albumname",
+  "tags"
+];
+const expectedExifTitle =
+  "Mistakes were made, and many lessons learned. I made these shelves myself. #diy #proud";
+const expectedExifDate = "2020-08-30";
+const expectedExifAlbumName = "diy-projects";
+
+const testPhotoDescriptionTags =
+  "Mistakes were made, and many lessons learned. I made these shelves myself. #diy #proud";
+const testPhotoDescriptionNoTags =
+  "Mistakes were made, and many lessons learned. I made these shelves myself.";
+const expectedTags = [
+  "diy",
+  "proud"
+];
+const expectedHashTags = [
+  "#diy",
+  "#proud"
+];
+
 describe( "PhotoPages", function() {
 
   describe( "#constructor", function() {
@@ -260,30 +284,21 @@ describe( "PhotoPages", function() {
 
     it( "should return the required EXIF data in a map", async function() {
       const command = new PhotoPages( contentDirectory );
-      // eslint-disable-next-line max-len
-      const expectedKeys = [
-        "title",
-        "date",
-        "albumname"
-      ];
-      const expectedTitle =
-        "Mistakes were made, and many lessons learned. I made these shelves myself. #diy #proud";
-      const expectedDate = "2020-08-30";
-      const expectedAlbumName = "diy-projects";
 
       const tagMap = await command.getExifData( testPhotoPath );
 
       assert.ok( tagMap instanceof Map );
 
-      assert.strictEqual( tagMap.size, expectedKeys.length );
+      assert.strictEqual( tagMap.size, expectedExifKeys.length );
 
-      expectedKeys.forEach( element => {
+      expectedExifKeys.forEach( element => {
         assert.ok( tagMap.has( element ) );
       } );
 
-      assert.strictEqual( tagMap.get( "title" ), expectedTitle );
-      assert.strictEqual( tagMap.get( "date" ), expectedDate );
-      assert.strictEqual( tagMap.get( "albumname" ), expectedAlbumName );
+      assert.strictEqual( tagMap.get( "title" ), expectedExifTitle );
+      assert.strictEqual( tagMap.get( "date" ), expectedExifDate );
+      assert.strictEqual( tagMap.get( "albumname" ), expectedExifAlbumName );
+      assert.deepStrictEqual( tagMap.get( "tags" ), expectedTags );
     } );
   } );
 
@@ -310,10 +325,81 @@ describe( "PhotoPages", function() {
 title = "Mistakes were made, and many lessons learned. I made these shelves myself. #diy #proud"
 date = "2020-08-30"
 albumname = "diy-projects"
+tags = [ "diy", "proud" ]
 +++\n`;
 
       const frontMatter = command.buildTomlFrontMatter( tagMap );
       assert.strictEqual( frontMatter, expectedFrontMatter );
+    } );
+  } );
+
+  describe( "#getTags", function() {
+    it( "should throw an error if the first parameter is not supplied", function() {
+      const command = new PhotoPages( contentDirectory );
+      assert.throws( function() {
+        command.getTags();
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the first parameter is not a string", function() {
+      const command = new PhotoPages( contentDirectory );
+      assert.throws( function() {
+        command.getTags( new Object() );
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the second parameter is not supplied", function() {
+      const command = new PhotoPages( contentDirectory );
+      assert.throws( function() {
+        command.getTags( "" );
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the second parameter is not a boolean", function() {
+      const command = new PhotoPages( contentDirectory );
+      assert.throws( function() {
+        command.getTags( "", new Object() );
+      }, TypeError );
+    } );
+
+    it( "should return an array with the right number of elements", function() {
+      const command = new PhotoPages( contentDirectory );
+      const tags = command.getTags( testPhotoDescriptionTags );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, expectedTags.length );
+    } );
+
+    it( "should return an array of tags without hashes", function() {
+      const command = new PhotoPages( contentDirectory );
+      let tags = command.getTags( testPhotoDescriptionTags );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, expectedTags.length );
+      assert.deepStrictEqual( tags, expectedTags );
+
+      tags = command.getTags( testPhotoDescriptionTags, true );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, expectedTags.length );
+      assert.deepStrictEqual( tags, expectedTags );
+    } );
+
+    it( "should return an array of tags with hashes", function() {
+      const command = new PhotoPages( contentDirectory );
+      let tags = command.getTags( testPhotoDescriptionTags, false );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, expectedTags.length );
+      assert.deepStrictEqual( tags, expectedHashTags );
+    } );
+
+    it( "should return an empty array if no tags are found", function() {
+      const command = new PhotoPages( contentDirectory );
+      let tags = command.getTags( testPhotoDescriptionNoTags, true );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, 0 );
+
+      tags = command.getTags( testPhotoDescriptionNoTags, false );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, 0 );
+
     } );
   } );
 } );
