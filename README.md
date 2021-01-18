@@ -1,6 +1,6 @@
 # Gallery Utils
 
-![Node.js CI](https://github.com/techxplorer/gallery-utils/workflows/Node.js%20CI/badge.svg)
+![Node.js CI](https://github.com/techxplorer/gallery-utils/workflows/Node.js%20CI/badge.svg) ![GitHub](https://img.shields.io/github/license/techxplorer/gallery-utils) ![GitHub package.json version](https://img.shields.io/github/package-json/v/techxplorer/gallery-utils)
 
 This is a CLI app that I've developed which helps to build my [photo gallery][pg]
 website. It also provides a space for me to explore development using [Node.js][nj]
