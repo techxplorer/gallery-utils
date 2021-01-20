@@ -80,7 +80,7 @@ describe( "ImportPhotos", function() {
 
     it( "should throw an error if the inputPath parameter is not a directory", function() {
       assert.throws( function() {
-        new ImportPhotos( "./TestImportPhotos.js" );
+        new ImportPhotos( "./TestImportPhotos.js", contentDirectory );
       }, TypeError );
     } );
 
@@ -221,28 +221,28 @@ describe( "ImportPhotos", function() {
     it( "should throw an error if the photoList parameter is not supplied", function() {
       const command = new ImportPhotos( importDirectory, contentDirectory );
       assert.throws( function() {
-        command.filterPhotoList();
+        command.buildImportList();
       }, TypeError );
     } );
 
     it( "should throw an error if the photoList parameter is not an array", function() {
       const command = new ImportPhotos( importDirectory, contentDirectory );
       assert.throws( function() {
-        command.filterPhotoList( new Object() );
+        command.buildImportList( new Object() );
       }, TypeError );
     } );
 
     it( "should throw an error if the albumList parameter is not supplied", function() {
       const command = new ImportPhotos( importDirectory, contentDirectory );
       assert.throws( function() {
-        command.filterPhotoList( [] );
+        command.buildImportList( [] );
       }, TypeError );
     } );
 
     it( "should throw an error if the albumList parameter is not an array", function() {
       const command = new ImportPhotos( importDirectory, contentDirectory );
       assert.throws( function() {
-        command.filterPhotoList( [], new Object() );
+        command.buildImportList( [], new Object() );
       }, TypeError );
     } );
 

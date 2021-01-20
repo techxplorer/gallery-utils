@@ -32,6 +32,10 @@ const testPhotoPath = path.join(
   contentDirectory,
   "./albums/diy-projects/20200830-021808+0000-ig.jpg"
 );
+const testNoExifPhotPath = path.join(
+  contentDirectory,
+  "../content-no-albums/photos/photo-no-metadata.jpg"
+);
 
 const expectedExifKeys = [
   "title",
@@ -75,6 +79,16 @@ describe( "PhotoPages", function() {
     it( "should throw an error if the parameter is not a path to a directory", function() {
       assert.throws( function() {
         new PhotoPages( "./TestPhotoPages.js" );
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the parameter is not a path the right contents", function() {
+      assert.throws( function() {
+        new PhotoPages( path.resolve( contentDirectory, "../content-no-albums" ) );
+      }, TypeError );
+
+      assert.throws( function() {
+        new PhotoPages( path.resolve( contentDirectory, "../content-no-photos" ) );
       }, TypeError );
     } );
 
@@ -282,6 +296,13 @@ describe( "PhotoPages", function() {
       }, TypeError );
     } );
 
+    it( "should throw an error if no exif data can be found in the photo", async function() {
+      const command = new PhotoPages( contentDirectory );
+      assert.rejects( async function() {
+        command.getExifData( testNoExifPhotPath );
+      }, Error );
+    } );
+
     it( "should return the required EXIF data in a map", async function() {
       const command = new PhotoPages( contentDirectory );
 
@@ -358,7 +379,7 @@ tags = [ "diy", "proud" ]
     it( "should throw an error if the second parameter is not a boolean", function() {
       const command = new PhotoPages( contentDirectory );
       assert.throws( function() {
-        command.getTags( "", new Object() );
+        command.getTags( testPhotoDescriptionTags, new Object() );
       }, TypeError );
     } );
 

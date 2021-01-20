@@ -236,11 +236,7 @@ export default class PhotoPages {
       );
 
     } catch ( error ) {
-      if ( error instanceof ExifReader.errors.MetadataMissingError ) {
-        console.log( `No Exif data found in: ${photoFilePath}` );
-      }
-
-      throw error;
+      throw new Error( `No Exif data found in: ${photoFilePath}` );
     }
 
     return tagMap;
@@ -307,6 +303,10 @@ export default class PhotoPages {
     return tags;
   }
 
+  /* Ignore the run function as it only used by CLI script and uses
+   * all of the other functions which are tested
+   */
+  /* c8 ignore start */
   /**
    * Run the command by undertaking all of the required steps.
    */
@@ -337,4 +337,6 @@ export default class PhotoPages {
       `${logSymbols.success} Photos successfully copied into the gallery`
     );
   }
+
+  /* c8 ignore end */
 }

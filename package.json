@@ -12,7 +12,9 @@
   "type": "module",
   "scripts": {
     "test": "mocha",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "coverage": "c8 --check-coverage mocha",
+    "precoverage": "rimraf ./coverage"
   },
   "author": "Corey Wallis <corey@techxplorer.com> (https://techxplorer.com)",
   "license": "MIT",
@@ -23,6 +25,7 @@
     "recursive": true
   },
   "devDependencies": {
+    "c8": "^7.4.0",
     "eslint": "^7.16.0",
     "eslint-config-jquery": "^3.0.0",
     "eslint-plugin-import": "^2.22.1",

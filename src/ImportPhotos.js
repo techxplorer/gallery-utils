@@ -366,6 +366,10 @@ export default class ImportPhotos {
     await this.exiftool.end();
   }
 
+  /* Ignore the run function as it only used by CLI script and uses
+   * all of the other functions which are tested
+   */
+  /* c8 ignore start */
   /**
    * Run the command by undertaking all of the required steps.
    *
@@ -425,5 +429,7 @@ export default class ImportPhotos {
       `${logSymbols.success} Photos successfully imported into albums in the gallery`
     );
   }
+
+  /* c8 ignore stop */
 
 }
