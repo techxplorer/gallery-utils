@@ -1,6 +1,6 @@
 {
   "name": "@techxplprer/gallery-utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A CLI app that helps build my photo gallery website",
   "main": "index.js",
   "bin": {
