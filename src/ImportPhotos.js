@@ -59,9 +59,13 @@ export default class ImportPhotos {
       throw new TypeError( "contentPath parameter must be a directory" );
     }
 
-    // Ensure paths use '/' as path seperators so that globbing etc works.
+    // Ensure paths use '/' as path separators so that globbing etc works.
     this.inputPath = this.inputPath.split( path.sep ).join( path.posix.sep );
     this.contentPath = this.contentPath.split( path.sep ).join( path.posix.sep );
+
+    // Remove trailing slash if present.
+    this.inputPath = this.inputPath.replace( /\/+$/, "" );
+    this.contentPath = this.contentPath.replace( /\/+$/, "" );
 
   }
 

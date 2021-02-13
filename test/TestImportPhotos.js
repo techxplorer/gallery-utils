@@ -458,6 +458,48 @@ describe( "ImportPhotos", function() {
 
     } );
 
+    // A lot of file system stuff happens in this test. Adjust the slow timeout accordingly.
+    this.slow( 1500 );
+
+    it( "should copy a photo correctly when paths have a trailing slash", async function() {
+      const command = new ImportPhotos( importDirectory + "/", contentDirectory + "/" );
+
+      const photoList = await command.getPhotoList();
+      const albumDetails = await command.getAlbumDetails();
+
+      const importList = command.buildImportList( photoList, albumDetails );
+
+      const albumName = "diy-projects";
+      const album = importList.get( albumName );
+      let photo = album.get( "photos/202101/5e9429ad9b6a9014eca37bea8e7723ef.jpg" );
+
+      photo = await command.updateExifTags( photo );
+
+      await command.importPhoto( albumName, photo );
+
+      assert.ok(
+        await Utils.testFilePath(
+          path.join(
+            contentDirectory,
+            "albums/diy-projects",
+            "20210109-052154+0000-ig.jpg"
+          )
+        )
+      );
+
+      assert.ok(
+        await Utils.testFilePath(
+          path.join(
+            importDirectory,
+            "photos/202101/20210109-052154+0000-ig.jpg"
+          )
+        )
+      );
+
+      await command.tidyUp();
+
+    } );
+
   } );
 
   describe( "#importPhotos", function() {
