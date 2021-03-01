@@ -44,7 +44,7 @@ export default async function run() {
   program.version( appPackage.version, "-v, --version" )
     .description( "Utilities to manage my photo gallery" );
 
-  program.command( "photo-pages <input-dir>" )
+  program.command( "photo-pages <content-dir>" )
     .description( "Build the individual photo gallery pages" )
     .action( async function( input ) {
 
