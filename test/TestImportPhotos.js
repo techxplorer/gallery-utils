@@ -278,15 +278,15 @@ describe( "ImportPhotos", function() {
   describe( "#updateIndexFiles", function() {
     it( "should throw an error if the albumDetails parameter is not supplied", function() {
       const command = new ImportPhotos( importDirectory, contentDirectory );
-      assert.throws( function() {
-        command.updateAlbumDetails();
+      assert.rejects( function() {
+        command.updateIndexFiles();
       }, TypeError );
     } );
 
     it( "should throw an error if the albumDetails parameter is not the right type", function() {
       const command = new ImportPhotos( importDirectory, contentDirectory );
-      assert.throws( function() {
-        command.updateAlbumDetails( new Object() );
+      assert.rejects( function() {
+        command.updateIndexFiles( new Object() );
       }, TypeError );
     } );
 
