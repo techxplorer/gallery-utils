@@ -217,6 +217,119 @@ describe( "ImportPhotos", function() {
 
   } );
 
+  describe( "#updateAlbumDetails", function() {
+    it( "should throw an error if the albumDetails parameter is not supplied", function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+      assert.throws( function() {
+        command.updateAlbumDetails();
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the albumDetails parameter is not the right type", function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+      assert.throws( function() {
+        command.updateAlbumDetails( new Object() );
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the importList parameter is not supplied", async function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+      const albumDetails = await command.getAlbumDetails();
+
+      assert.throws( function() {
+        command.updateAlbumDetails( albumDetails );
+      }, TypeError );
+    } );
+
+    it( "should throw error if the importList parameter is not the right type", async function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+      const albumDetails = await command.getAlbumDetails();
+
+      assert.throws( function() {
+        command.updateAlbumDetails( albumDetails, new Object() );
+      }, TypeError );
+    } );
+
+    it( "should return an array with the right number of elements", async function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+
+      const photoList = await command.getPhotoList();
+      let albumDetails = await command.getAlbumDetails();
+
+      const oldDates = new Map();
+
+      for ( const album of albumDetails ) {
+        oldDates.set( album.albumKey, album.date );
+      }
+
+      const importList = command.buildImportList( photoList, albumDetails );
+      albumDetails = command.updateAlbumDetails( albumDetails, importList );
+
+      assert.strictEqual( expectedAlbums, albumDetails.length );
+
+      for ( const album of albumDetails ) {
+        const oldDate = oldDates.get( album.albumKey ).date;
+        assert.ok( oldDate !== album.date );
+      }
+    } );
+
+  } );
+
+  describe( "#updateIndexFiles", function() {
+    it( "should throw an error if the albumDetails parameter is not supplied", function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+      assert.throws( function() {
+        command.updateAlbumDetails();
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the albumDetails parameter is not the right type", function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+      assert.throws( function() {
+        command.updateAlbumDetails( new Object() );
+      }, TypeError );
+    } );
+
+    it( "should update the album index files with new metadata", async function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+
+      const photoList = await command.getPhotoList();
+      let albumDetails = await command.getAlbumDetails();
+      const importList = command.buildImportList( photoList, albumDetails );
+      albumDetails = command.updateAlbumDetails( albumDetails, importList );
+      await command.updateIndexFiles( albumDetails );
+
+      for ( const album of albumDetails ) {
+        assert.ok(
+          await Utils.testFilePath(
+            album.indexPath
+          )
+        );
+
+        assert.ok(
+          await Utils.testFilePath(
+            album.indexPath + ".old"
+          )
+        );
+
+        try {
+          await fs.unlink(
+            album.indexPath
+          );
+
+          await fs.rename(
+            album.indexPath + ".old",
+            album.indexPath
+          );
+        } catch ( error ) {
+
+          // Ignore the error if the file is not found.
+        }
+      }
+
+    } );
+  } );
+
   describe( "#buildImportList", function() {
     it( "should throw an error if the photoList parameter is not supplied", function() {
       const command = new ImportPhotos( importDirectory, contentDirectory );

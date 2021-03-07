@@ -173,6 +173,82 @@ export default class ImportPhotos {
   }
 
   /**
+   * Update the date of the album to the latest photo date.
+   *
+   * @param {Array} albumList A list of albums and their metadata.
+   * @param {Map} importList A list of photos for potential import.
+   *
+   * @returns {Array} A list of albums and their metadata.
+   *
+   * @throws {TypeError} If the parameters do not pass validation.
+   */
+  updateAlbumDetails( albumList, importList ) {
+    if ( !albumList || !Array.isArray( albumList ) ) {
+      throw new TypeError( "albumList parameter is required and must be an Array" );
+    }
+
+    if ( !importList || ( importList instanceof Map ) === false ) {
+      throw new TypeError( "importList parameter is required and must be an Array" );
+    }
+
+    for ( const album of albumList ) {
+      if ( importList.has( album.albumKey ) ) {
+        let albumDate = DateTime.fromISO( album.date );
+
+        for ( const photo of importList.get( album.albumKey ).values() ) {
+          const photoDate = DateTime.fromISO( photo.taken_at );
+
+          if ( photoDate > albumDate ) {
+            albumDate = photoDate;
+          }
+        }
+
+        album.date = albumDate.toISODate();
+      }
+    }
+
+    return albumList;
+  }
+
+  /**
+   * Update the index files of the albums.
+   *
+   * @param {Array} albumList A list of albums and their metadata.
+   *
+   * @throws {TypeError} If the parameters do not pass validation.
+   */
+  async updateIndexFiles( albumList ) {
+
+    if ( !albumList || !Array.isArray( albumList ) ) {
+      throw new TypeError( "albumList parameter is required and must be an Array" );
+    }
+
+    for ( const album of albumList ) {
+      const newMetadata = {
+        title: album.title,
+        date: album.date,
+        subtitle: album.subtitle,
+        description: album.description,
+        hashtags: album.hashtags
+      };
+
+      const newFrontMatter =
+      `+++\n${toml.stringify( newMetadata )}+++\n`;
+
+      await fs.copyFile(
+        album.indexPath,
+        album.indexPath + ".old"
+      );
+
+      await fs.writeFile(
+        album.indexPath,
+        newFrontMatter
+      );
+    }
+
+  }
+
+  /**
    * Map a list of potential photos to the albums and identify those for
    * import that match the hashtags defined in the album metadata.
    *
@@ -403,7 +479,7 @@ export default class ImportPhotos {
       return;
     }
 
-    const albumDetails = await this.getAlbumDetails();
+    let albumDetails = await this.getAlbumDetails();
 
     console.log(
       `${logSymbols.info} Found ${albumDetails.length} albums in content directory`
@@ -426,6 +502,9 @@ export default class ImportPhotos {
     console.log( `${logSymbols.info} Importing photos...` );
 
     await this.importPhotos( importList );
+
+    albumDetails = this.updateAlbumDetails( albumDetails, importList );
+    await this.updateIndexFiles( albumDetails );
 
     await this.tidyUp();
 
