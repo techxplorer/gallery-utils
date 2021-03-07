@@ -78,26 +78,34 @@ export default class ImportPhotos {
   async getPhotoList() {
     const mediaJsonPath = path.join(
       this.inputPath,
-      "media.json"
+      "./content/posts_1.json"
     );
 
     try {
       Utils.testFilePath( mediaJsonPath );
     } catch ( e ) {
-      throw new TypeError( "media.json file not found in input directory" );
+      throw new TypeError( "/content/posts_1.json file not found in input directory" );
     }
 
     const mediaJSON = await fs.readFile( mediaJsonPath );
 
     const media = JSON.parse( mediaJSON );
 
-    return media.photos;
+    const photoList = new Array();
+
+    for ( const element of media ) {
+      if ( element.media[ 0 ] !== undefined ) {
+        photoList.push( element.media[ 0 ] );
+      }
+    }
+
+    return photoList;
   }
 
   /**
    * Filter the list of photos to those taken after the specified date.
    *
-   * @param {Array} photoList A list of photo object from the media.json file.
+   * @param {Array} photoList A list of photo objects from the media.json file.
    * @param {string} afterDate Photos must be taken on or after this date.
    *
    * @returns {Array} An array of photo objects for photos taken on or after the afterDate.
@@ -124,7 +132,9 @@ export default class ImportPhotos {
     const filteredList = new Array();
 
     for ( const photo of photoList ) {
-      const takenDateTime = DateTime.fromISO( photo.taken_at );
+      const takenDateTime = DateTime.fromSeconds(
+        photo.creation_timestamp
+      );
 
       if ( takenDateTime >= filterDateTime ) {
         filteredList.push( photo );
@@ -273,13 +283,13 @@ export default class ImportPhotos {
     for ( const album of albumList ) {
       for ( const tag of album.hashtags ) {
         for ( const photo of photoList ) {
-          if ( photo.caption.includes( tag ) === true ) {
+          if ( photo.title.includes( tag ) === true ) {
             if ( importList.has( album.albumKey ) === false ) {
               importList.set( album.albumKey, new Map() );
             }
             const importAlbum = importList.get( album.albumKey );
-            if ( importAlbum.has( photo.path ) === false ) {
-              importAlbum.set( photo.path, photo );
+            if ( importAlbum.has( photo.uri ) === false ) {
+              importAlbum.set( photo.uri, photo );
             }
           }
         }
@@ -308,17 +318,15 @@ export default class ImportPhotos {
       this.exiftool = new ExifTool();
     }
 
-    const fileExt = path.extname( photo.path );
-    let newFileName = DateTime.fromISO( photo.taken_at ).toUTC().toFormat( "yyyyMMdd-HHmmssZZZ" );
+    const fileExt = path.extname( photo.uri );
+    const takenAt = DateTime.fromSeconds( photo.creation_timestamp ).toUTC();
+    let newFileName = takenAt.toFormat( "yyyyMMdd-HHmmssZZZ" );
+
     newFileName = `${newFileName}-ig${fileExt}`;
 
-    const dateOnly = DateTime.fromISO( photo.taken_at ).toUTC().toFormat( "yyyyMMdd" );
+    const dateOnly = takenAt.toFormat( "yyyyMMdd" );
 
     let subjectTags = [];
-
-    if ( photo.location !== undefined ) {
-      subjectTags = photo.location.split( "," ).map( item => item.trim() );
-    }
 
     subjectTags.push( dateOnly );
     subjectTags.push( ... [
@@ -327,15 +335,15 @@ export default class ImportPhotos {
     ] );
 
     const newTags = {
-      AllDates: photo.taken_at,
-      "XMP-dc:Description": photo.caption,
+      AllDates: takenAt.toISO(),
+      "XMP-dc:Description": photo.title,
       "XMP-dc:Subject": subjectTags,
-      "ImageDescription": this.iconv.convert( photo.caption ).toString()
+      "ImageDescription": this.iconv.convert( photo.title ).toString()
     };
 
     const photoPath = path.join(
       this.inputPath,
-      photo.path
+      photo.uri
     );
 
     // Write the new EXIF tags to the photo.
@@ -430,7 +438,7 @@ export default class ImportPhotos {
         await this.importPhoto( albumKey, importPhoto );
 
         if ( cached === false ) {
-          this.importCache.set( importPhoto.path, importPhoto );
+          this.importCache.set( importPhoto.uri, importPhoto );
         }
       }
     }

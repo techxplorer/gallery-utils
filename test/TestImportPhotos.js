@@ -15,15 +15,15 @@ import { exiftool } from "exiftool-vendored";
 const contentDirectory = path.resolve( "test/artefacts/content" );
 const importDirectory = path.resolve( "test/artefacts/instagram" );
 
-const expectedMediaPhotos = 5;
+const expectedMediaPhotos = 6;
 const expectedFilteredPhotos = 3;
 const filterPhotoDate = "2020-12-01";
 
 const expectedPhotoKeys = [
-  "caption",
-  "taken_at",
-  "location",
-  "path"
+  "uri",
+  "creation_timestamp",
+  "media_metadata",
+  "title"
 ];
 
 const expectedAlbums = 2;
@@ -57,10 +57,10 @@ const expectedImportedPhotos = [
 ];
 
 const expectedUpdatedPhotos = [
-  "/photos/202011/20201115-095456+0000-ig.jpg",
-  "/photos/202011/20201128-033735+0000-ig.jpg",
-  "/photos/202012/20201208-212942+0000-ig.jpg",
-  "/photos/202101/20210109-052154+0000-ig.jpg"
+  "/media/posts/202011/20201115-095456+0000-ig.jpg",
+  "/media/posts/202011/20201128-033735+0000-ig.jpg",
+  "/media/posts/202012/20201208-212942+0000-ig.jpg",
+  "/media/posts/202101/20210109-052154+0000-ig.jpg"
 ];
 
 describe( "ImportPhotos", function() {
@@ -135,7 +135,10 @@ describe( "ImportPhotos", function() {
       const command = new ImportPhotos( importDirectory, contentDirectory );
       const photoList = await command.getPhotoList();
 
+      assert.ok( Array.isArray( photoList ) );
+
       for ( const photo of photoList ) {
+        assert.ok( typeof photo === "object" );
         for ( const photoKey of expectedPhotoKeys ) {
           assert.ok( Object.prototype.hasOwnProperty.call( photo, photoKey ) );
         }
@@ -438,7 +441,7 @@ describe( "ImportPhotos", function() {
         assert.strictEqual( oldPhoto[ photoKey ], newPhoto[ photoKey ] );
       }
 
-      assert.ok( newPhoto.newPath.endsWith( "20210109-052154+0000-ig.jpg" ) );
+      assert.ok( newPhoto.newPath.endsWith( "20201128-033735+0000-ig.jpg" ) );
       assert.ok( Utils.testFilePath( newPhoto.newPath ) );
 
       const fileData = await fs.readFile( newPhoto.newPath );
@@ -449,15 +452,15 @@ describe( "ImportPhotos", function() {
 
       assert.strictEqual(
         tags.exif.ImageDescription.description,
-        oldPhoto.caption
+        oldPhoto.title
       );
 
       assert.strictEqual(
         tags.xmp.description.description,
-        oldPhoto.caption
+        oldPhoto.title
       );
 
-      const oldPhotoDate = DateTime.fromISO( oldPhoto.taken_at );
+      const oldPhotoDate = DateTime.fromSeconds( oldPhoto.creation_timestamp );
       const newPhotoDate = DateTime.fromFormat(
         tags.exif.DateTime.description + "+00:00",
         "yyyy:MM:dd HH:mm:ssZZ"
@@ -542,7 +545,9 @@ describe( "ImportPhotos", function() {
 
       const albumName = "diy-projects";
       const album = importList.get( albumName );
-      let photo = album.get( "photos/202101/5e9429ad9b6a9014eca37bea8e7723ef.jpg" );
+      let photo = album.get(
+        "media/posts/202101/136666019_120733959891465_6563206315612846459_n_17856779924435952.jpg"
+      );
 
       photo = await command.updateExifTags( photo );
 
@@ -562,7 +567,7 @@ describe( "ImportPhotos", function() {
         await Utils.testFilePath(
           path.join(
             importDirectory,
-            "photos/202101/20210109-052154+0000-ig.jpg"
+            "media/posts/202101/20210109-052154+0000-ig.jpg"
           )
         )
       );
@@ -584,7 +589,9 @@ describe( "ImportPhotos", function() {
 
       const albumName = "diy-projects";
       const album = importList.get( albumName );
-      let photo = album.get( "photos/202101/5e9429ad9b6a9014eca37bea8e7723ef.jpg" );
+      let photo = album.get(
+        "media/posts/202101/136666019_120733959891465_6563206315612846459_n_17856779924435952.jpg"
+      );
 
       photo = await command.updateExifTags( photo );
 
@@ -604,7 +611,7 @@ describe( "ImportPhotos", function() {
         await Utils.testFilePath(
           path.join(
             importDirectory,
-            "photos/202101/20210109-052154+0000-ig.jpg"
+            "media/posts/202101/20210109-052154+0000-ig.jpg"
           )
         )
       );
