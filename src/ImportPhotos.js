@@ -206,7 +206,7 @@ export default class ImportPhotos {
         let albumDate = DateTime.fromISO( album.date );
 
         for ( const photo of importList.get( album.albumKey ).values() ) {
-          const photoDate = DateTime.fromISO( photo.taken_at );
+          const photoDate = DateTime.fromSeconds( photo.creation_timestamp );
 
           if ( photoDate > albumDate ) {
             albumDate = photoDate;
@@ -214,6 +214,7 @@ export default class ImportPhotos {
         }
 
         album.date = albumDate.toISODate();
+        album.updated = true;
       }
     }
 
@@ -234,26 +235,28 @@ export default class ImportPhotos {
     }
 
     for ( const album of albumList ) {
-      const newMetadata = {
-        title: album.title,
-        date: album.date,
-        subtitle: album.subtitle,
-        description: album.description,
-        hashtags: album.hashtags
-      };
+      if ( album.updated !== undefined ) {
+        const newMetadata = {
+          title: album.title,
+          date: album.date,
+          subtitle: album.subtitle,
+          description: album.description,
+          hashtags: album.hashtags
+        };
 
-      const newFrontMatter =
-      `+++\n${toml.stringify( newMetadata )}+++\n`;
+        const newFrontMatter =
+        `+++\n${toml.stringify( newMetadata )}+++\n`;
 
-      await fs.copyFile(
-        album.indexPath,
-        album.indexPath + ".old"
-      );
+        await fs.copyFile(
+          album.indexPath,
+          album.indexPath + ".old"
+        );
 
-      await fs.writeFile(
-        album.indexPath,
-        newFrontMatter
-      );
+        await fs.writeFile(
+          album.indexPath,
+          newFrontMatter
+        );
+      }
     }
 
   }
