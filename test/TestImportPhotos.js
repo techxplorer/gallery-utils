@@ -65,6 +65,13 @@ const expectedUpdatedPhotos = [
 
 describe( "ImportPhotos", function() {
 
+  /*
+   * Setup the timezone for the running Node process to ensure consistent tests.
+   */
+  before( function() {
+    process.env.TZ = "Australia/Adelaide";
+  } );
+
   describe( "#constructor", function() {
     it( "should throw an error if the parameters are not supplied", function() {
       assert.throws( function() {
