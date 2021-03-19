@@ -441,7 +441,11 @@ describe( "ImportPhotos", function() {
         assert.strictEqual( oldPhoto[ photoKey ], newPhoto[ photoKey ] );
       }
 
-      assert.ok( newPhoto.newPath.endsWith( "20201128-140735+1030-ig.jpg" ) );
+      assert.ok(
+        newPhoto.newPath.endsWith( "20201128-140735+1030-ig.jpg" ),
+        `Path does not end with expected value, it ends with ${path.basename( newPhoto.newPath )}`
+
+      );
       assert.ok( Utils.testFilePath( newPhoto.newPath ) );
 
       const fileData = await fs.readFile( newPhoto.newPath );
