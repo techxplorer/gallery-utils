@@ -5,7 +5,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-import ExifReader from "exifreader";
+import Exifr from "exifr";
 import fg from "fast-glob";
 import logSymbols from "log-symbols";
 import toml from "@iarna/toml";
@@ -207,24 +207,25 @@ export default class PhotoPages {
     const fileData = await fs.readFile( photoFilePath );
 
     try {
-      const tags = ExifReader.load( fileData, { expanded: true } );
+      const tags = await Exifr.parse( fileData );
 
-      if ( tags.exif.ImageDescription.description !== undefined ) {
+      if ( tags.ImageDescription !== undefined ) {
         tagMap.set(
           "title",
-          tags.exif.ImageDescription.description
+          tags.ImageDescription
         );
 
         tagMap.set(
           "tags",
-          this.getTags( tags.exif.ImageDescription.description )
+          this.getTags( tags.ImageDescription )
         );
       }
 
-      if ( tags.exif.DateTime.description !== undefined ) {
+      if ( tags.CreateDate !== undefined ) {
         tagMap.set(
           "date",
-          tags.exif.DateTime.description
+          tags.CreateDate
+            .toISOString()
             .substring( 0, 10 )
             .replace( /:/g, "-" )
         );

@@ -322,7 +322,7 @@ export default class ImportPhotos {
     }
 
     const fileExt = path.extname( photo.uri );
-    const takenAt = DateTime.fromSeconds( photo.creation_timestamp ).toUTC();
+    const takenAt = DateTime.fromSeconds( photo.creation_timestamp );
     let newFileName = takenAt.toFormat( "yyyyMMdd-HHmmssZZZ" );
 
     newFileName = `${newFileName}-ig${fileExt}`;

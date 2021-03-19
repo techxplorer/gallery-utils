@@ -45,7 +45,7 @@ const expectedExifKeys = [
 ];
 const expectedExifTitle =
   "Mistakes were made, and many lessons learned. I made these shelves myself. #diy #proud";
-const expectedExifDate = "2020-08-30";
+const expectedExifDate = "2020-08-29";
 const expectedExifAlbumName = "diy-projects";
 
 const testPhotoDescriptionTags =
@@ -344,7 +344,7 @@ describe( "PhotoPages", function() {
 
       const expectedFrontMatter = `+++
 title = "Mistakes were made, and many lessons learned. I made these shelves myself. #diy #proud"
-date = "2020-08-30"
+date = "2020-08-29"
 albumname = "diy-projects"
 tags = [ "diy", "proud" ]
 +++\n`;

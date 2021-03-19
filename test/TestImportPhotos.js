@@ -7,7 +7,7 @@ import Utils from "../src/Utils.js";
 
 import assert from "assert";
 import { DateTime } from "luxon";
-import ExifReader from "exifreader";
+import Exifr from "exifr";
 import { promises as fs } from "fs";
 import path from "path";
 import { exiftool } from "exiftool-vendored";
@@ -49,18 +49,18 @@ const expectedAlbumListImportSizes = [
 ];
 
 const expectedImportedPhotos = [
-  "/albums/diy-projects/20201115-095456+0000-ig.jpg",
-  "/albums/diy-projects/20201128-033735+0000-ig.jpg",
-  "/albums/diy-projects/20201208-212942+0000-ig.jpg",
-  "/albums/diy-projects/20210109-052154+0000-ig.jpg",
-  "/albums/nanoblock-models/20201208-212942+0000-ig.jpg"
+  "/albums/diy-projects/20201115-202456+1030-ig.jpg",
+  "/albums/diy-projects/20201128-140735+1030-ig.jpg",
+  "/albums/diy-projects/20201209-075942+1030-ig.jpg",
+  "/albums/diy-projects/20210109-155154+1030-ig.jpg",
+  "/albums/nanoblock-models/20201209-075942+1030-ig.jpg"
 ];
 
 const expectedUpdatedPhotos = [
-  "/media/posts/202011/20201115-095456+0000-ig.jpg",
-  "/media/posts/202011/20201128-033735+0000-ig.jpg",
-  "/media/posts/202012/20201208-212942+0000-ig.jpg",
-  "/media/posts/202101/20210109-052154+0000-ig.jpg"
+  "/media/posts/202011/20201115-202456+1030-ig.jpg",
+  "/media/posts/202011/20201128-140735+1030-ig.jpg",
+  "/media/posts/202012/20201209-075942+1030-ig.jpg",
+  "/media/posts/202101/20210109-155154+1030-ig.jpg"
 ];
 
 describe( "ImportPhotos", function() {
@@ -441,30 +441,27 @@ describe( "ImportPhotos", function() {
         assert.strictEqual( oldPhoto[ photoKey ], newPhoto[ photoKey ] );
       }
 
-      assert.ok( newPhoto.newPath.endsWith( "20201128-033735+0000-ig.jpg" ) );
+      assert.ok( newPhoto.newPath.endsWith( "20201128-140735+1030-ig.jpg" ) );
       assert.ok( Utils.testFilePath( newPhoto.newPath ) );
 
       const fileData = await fs.readFile( newPhoto.newPath );
-      const tags = ExifReader.load( fileData, { expanded: true } );
+      const tags = await Exifr.parse( fileData, { xmp: true } );
 
-      assert.ok( tags.exif.ImageDescription.description !== undefined );
-      assert.ok( tags.exif.DateTime.description !== undefined );
+      assert.ok( tags.ImageDescription !== undefined );
+      assert.ok( tags.CreateDate !== undefined );
 
       assert.strictEqual(
-        tags.exif.ImageDescription.description,
+        tags.ImageDescription,
         oldPhoto.title
       );
 
       assert.strictEqual(
-        tags.xmp.description.description,
+        tags.description.value,
         oldPhoto.title
       );
 
       const oldPhotoDate = DateTime.fromSeconds( oldPhoto.creation_timestamp );
-      const newPhotoDate = DateTime.fromFormat(
-        tags.exif.DateTime.description + "+00:00",
-        "yyyy:MM:dd HH:mm:ssZZ"
-      );
+      const newPhotoDate = DateTime.fromJSDate( tags.CreateDate );
 
       assert.ok(
         oldPhotoDate.equals( newPhotoDate )
@@ -482,7 +479,7 @@ describe( "ImportPhotos", function() {
         await fs.unlink(
           path.join(
             importDirectory,
-            "photos/202101/20210109-052154+0000-ig.jpg"
+            "photos/202101/20201115-202456+1030-ig.jpg"
           )
         );
       } catch ( error ) {
@@ -495,7 +492,7 @@ describe( "ImportPhotos", function() {
           path.join(
             contentDirectory,
             "albums/diy-projects",
-            "20210109-052154+0000-ig.jpg"
+            "20201115-202456+1030-ig.jpg"
           )
         );
       } catch ( error ) {
@@ -558,7 +555,7 @@ describe( "ImportPhotos", function() {
           path.join(
             contentDirectory,
             "albums/diy-projects",
-            "20210109-052154+0000-ig.jpg"
+            "20210109-155154+1030-ig.jpg"
           )
         )
       );
@@ -567,7 +564,7 @@ describe( "ImportPhotos", function() {
         await Utils.testFilePath(
           path.join(
             importDirectory,
-            "media/posts/202101/20210109-052154+0000-ig.jpg"
+            "media/posts/202101/20210109-155154+1030-ig.jpg"
           )
         )
       );
@@ -602,7 +599,7 @@ describe( "ImportPhotos", function() {
           path.join(
             contentDirectory,
             "albums/diy-projects",
-            "20210109-052154+0000-ig.jpg"
+            "20210109-155154+1030-ig.jpg"
           )
         )
       );
@@ -611,7 +608,7 @@ describe( "ImportPhotos", function() {
         await Utils.testFilePath(
           path.join(
             importDirectory,
-            "media/posts/202101/20210109-052154+0000-ig.jpg"
+            "media/posts/202101/20210109-155154+1030-ig.jpg"
           )
         )
       );
