@@ -748,4 +748,11 @@ describe( "ImportPhotos", function() {
 
   } );
 
+  /*
+   * Ensure that the exiftool process doesn't hang around if a test crashes
+   */
+  after( async function() {
+    await exiftool.end();
+  } );
+
 } );
