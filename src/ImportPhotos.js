@@ -95,7 +95,18 @@ export default class ImportPhotos {
 
     for ( const element of media ) {
       if ( element.media[ 0 ] !== undefined ) {
-        photoList.push( element.media[ 0 ] );
+        let photo = element.media[ 0 ];
+        if ( photo.media_metadata.photo_metadata.latitude !== undefined ) {
+          if ( photo.media_metadata.photo_metadata.longitude !== undefined ) {
+            photo.gps = {
+              latitude: photo.media_metadata.photo_metadata.latitude,
+              longitude: photo.media_metadata.photo_metadata.longitude
+            };
+
+            delete photo.media_metadata;
+          }
+        }
+        photoList.push( photo );
       }
     }
 
@@ -350,6 +361,13 @@ export default class ImportPhotos {
       "XMP-dc:Subject": subjectTags,
       "ImageDescription": this.iconv.convert( photo.title ).toString()
     };
+
+    if ( photo.gps !== undefined ) {
+      newTags.GPSLatitude = photo.gps.latitude;
+      newTags.GPSLatitudeRef = photo.gps.latitude;
+      newTags.GPSLongitude = photo.gps.longitude;
+      newTags.GPSLongitudeRef = photo.gps.longitude;
+    }
 
     const photoPath = path.join(
       this.inputPath,

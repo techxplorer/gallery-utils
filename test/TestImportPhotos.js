@@ -22,9 +22,14 @@ const filterPhotoDate = "2020-12-01";
 const expectedPhotoKeys = [
   "uri",
   "creation_timestamp",
-  "media_metadata",
+  "gps",
   "title"
 ];
+
+const expectedGpsCoordinates = {
+  latitude: -34.9288,
+  longitude: 138.6
+};
 
 const expectedAlbums = 2;
 const expectedAlbumObjectKeys = [
@@ -493,6 +498,15 @@ describe( "ImportPhotos", function() {
 
       assert.ok(
         oldPhotoDate.equals( newPhotoDate )
+      );
+
+      assert.strictEqual(
+        +( tags.latitude.toFixed( 4 ) ),
+        expectedGpsCoordinates.latitude
+      );
+      assert.strictEqual(
+        +( tags.longitude.toFixed( 1 ) ),
+        expectedGpsCoordinates.longitude
       );
     } );
 
