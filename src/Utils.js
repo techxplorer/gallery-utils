@@ -70,4 +70,42 @@ export default class Utils {
     return true;
   }
 
+  /**
+   * Get a list of tags from a peice of text.
+   *
+   * @param {string} text The text including the hash tags.
+   * @param {boolean} stripHash A boolean flag to strip the hashes from tags or not.
+   *
+   * @returns {Array} An array of tags found in the description.
+   *
+   * @throws {TypeError} If the parameters do not pass validation.
+   */
+  static getTags( text, stripHash = true ) {
+    if ( !text || typeof text !== "string" ) {
+      throw new TypeError( "text parameter is required and must be a string" );
+    }
+
+    if ( typeof stripHash !== "boolean" ) {
+      throw new TypeError( "stripHash parameter is required and must be a boolean" );
+    }
+
+    const tagsRegEx = new RegExp( "#+([a-zA-Z0-9_]+)", "g" );
+
+    let matches = text.matchAll( tagsRegEx );
+
+    let tags = new Array();
+
+    if ( stripHash === true ) {
+      for ( const match of matches ) {
+        tags.push( match[ 1 ] );
+      }
+    } else {
+      for ( const match of matches ) {
+        tags.push( match[ 0 ] );
+      }
+    }
+
+    return tags;
+  }
+
 }

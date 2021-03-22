@@ -63,6 +63,18 @@ const expectedUpdatedPhotos = [
   "/media/posts/202101/20210109-155154+1030-ig.jpg"
 ];
 
+const expectedExifSubjectTag =  [
+  20201128,
+  "Instagram",
+  "igphotos",
+  "crossstitch",
+  "christmasstitching",
+  "christmas",
+  "teddybear",
+  "lucieheatoncrosstitch",
+  "christmastree"
+];
+
 describe( "ImportPhotos", function() {
 
   /*
@@ -460,6 +472,7 @@ describe( "ImportPhotos", function() {
 
       assert.ok( tags.ImageDescription !== undefined );
       assert.ok( tags.CreateDate !== undefined );
+      assert.ok( tags.subject.length = expectedExifSubjectTag.length );
 
       assert.strictEqual(
         tags.ImageDescription,
@@ -470,6 +483,10 @@ describe( "ImportPhotos", function() {
         tags.description.value,
         oldPhoto.title
       );
+
+      for ( const tag of expectedExifSubjectTag ) {
+        assert.ok( tags.subject.indexOf( tag ) !== -1 );
+      }
 
       const oldPhotoDate = DateTime.fromSeconds( oldPhoto.creation_timestamp );
       const newPhotoDate = DateTime.fromJSDate( tags.CreateDate );

@@ -9,6 +9,19 @@ import path from "path";
 
 const contentDirectory = path.resolve( "test/artefacts/content" );
 
+const testPhotoDescriptionTags =
+  "Mistakes were made, and many lessons learned. I made these shelves myself. #diy #proud";
+const testPhotoDescriptionNoTags =
+  "Mistakes were made, and many lessons learned. I made these shelves myself.";
+const expectedTags = [
+  "diy",
+  "proud"
+];
+const expectedHashTags = [
+  "#diy",
+  "#proud"
+];
+
 describe( "Utils", function() {
 
   describe( "#testDirPath", function() {
@@ -134,6 +147,75 @@ describe( "Utils", function() {
       assert.ok(
         Utils.testFilePath( path.join( contentDirectory, "./photos/.gitinclude" ) )
       );
+    } );
+  } );
+
+  describe( "#getTags", function() {
+    it( "should throw an error if the first parameter is not supplied", function() {
+      assert.throws( function() {
+        Utils.getTags();
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the first parameter is not a string", function() {
+
+      assert.throws( function() {
+        Utils.getTags( new Object() );
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the second parameter is not supplied", function() {
+
+      assert.throws( function() {
+        Utils.getTags( "" );
+      }, TypeError );
+    } );
+
+    it( "should throw an error if the second parameter is not a boolean", function() {
+
+      assert.throws( function() {
+        Utils.getTags( testPhotoDescriptionTags, new Object() );
+      }, TypeError );
+    } );
+
+    it( "should return an array with the right number of elements", function() {
+
+      const tags = Utils.getTags( testPhotoDescriptionTags );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, expectedTags.length );
+    } );
+
+    it( "should return an array of tags without hashes", function() {
+
+      let tags = Utils.getTags( testPhotoDescriptionTags );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, expectedTags.length );
+      assert.deepStrictEqual( tags, expectedTags );
+
+      tags = Utils.getTags( testPhotoDescriptionTags, true );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, expectedTags.length );
+      assert.deepStrictEqual( tags, expectedTags );
+    } );
+
+    it( "should return an array of tags with hashes", function() {
+
+      let tags = Utils.getTags( testPhotoDescriptionTags, false );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, expectedTags.length );
+      assert.deepStrictEqual( tags, expectedHashTags );
+    } );
+
+    it( "should return an empty array if no tags are found", function() {
+
+      let tags = Utils.getTags( testPhotoDescriptionNoTags, true );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, 0 );
+
+      tags = Utils.getTags( testPhotoDescriptionNoTags, false );
+      assert.ok( Array.isArray( tags ) );
+      assert.strictEqual( tags.length, 0 );
+
     } );
   } );
 } );

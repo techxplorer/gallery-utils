@@ -337,6 +337,13 @@ export default class ImportPhotos {
       "igphotos"
     ] );
 
+    // Add any hashtags in the photo description to the subject field.
+    const hashTags = Utils.getTags( photo.title );
+
+    if ( hashTags.length > 0 ) {
+      subjectTags.push( ... hashTags );
+    }
+
     const newTags = {
       AllDates: takenAt.toISO(),
       "XMP-dc:Description": photo.title,

@@ -277,31 +277,7 @@ export default class PhotoPages {
    * @throws {TypeError} If the parameters do not pass validation.
    */
   getTags( photoDescription, stripHash = true ) {
-    if ( !photoDescription || typeof photoDescription !== "string" ) {
-      throw new TypeError( "photoDescription parameter is required and must be a string" );
-    }
-
-    if ( typeof stripHash !== "boolean" ) {
-      throw new TypeError( "stripHash parameter is required and must be a boolean" );
-    }
-
-    const tagsRegEx = new RegExp( "#+([a-zA-Z0-9_]+)", "g" );
-
-    let matches = photoDescription.matchAll( tagsRegEx );
-
-    let tags = new Array();
-
-    if ( stripHash === true ) {
-      for ( const match of matches ) {
-        tags.push( match[ 1 ] );
-      }
-    } else {
-      for ( const match of matches ) {
-        tags.push( match[ 0 ] );
-      }
-    }
-
-    return tags;
+    return Utils.getTags( photoDescription, stripHash );
   }
 
   /* Ignore the run function as it only used by CLI script and uses
