@@ -80,6 +80,13 @@ const expectedExifSubjectTag =  [
   "christmastree"
 ];
 
+const testFacebookString =
+  // eslint-disable-next-line max-len
+  "Notre Dame Cathedral \u00f0\u009f\u0087\u00ab\u00f0\u009f\u0087\u00b7 #nanoblock #nanoblocks #nanoblockfrance #france";
+
+const fixedFacebookString =
+  "Notre Dame Cathedral 🇫🇷 #nanoblock #nanoblocks #nanoblockfrance #france";
+
 describe( "ImportPhotos", function() {
 
   /*
@@ -657,6 +664,23 @@ describe( "ImportPhotos", function() {
 
       await command.tidyUp();
 
+    } );
+
+  } );
+
+  describe( "#decodeFacebookString", function() {
+
+    it( "should throw an error if the input parameter is not supplied", function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+      assert.rejects( async function() {
+        command.decodeFacebookString();
+      }, TypeError );
+    } );
+
+    it( "should decode a string correctly", function() {
+      const command = new ImportPhotos( importDirectory, contentDirectory );
+      const testOutput = command.decodeFacebookString( testFacebookString );
+      assert.strictEqual( testOutput, fixedFacebookString );
     } );
 
   } );

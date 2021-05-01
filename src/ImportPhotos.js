@@ -8,7 +8,6 @@ import path from "path";
 import { DateTime } from "luxon";
 import { exiftool, ExifTool } from "exiftool-vendored";
 import fg from "fast-glob";
-import { Iconv } from "iconv";
 import logSymbols from "log-symbols";
 import toml from "@iarna/toml";
 
@@ -24,7 +23,7 @@ export default class ImportPhotos {
    *
    * @param {string} inputPath The full path to the input directory.
    * @param {string} contentPath The full path to the content directory.
-   * @throws {TypeError} When the inputPath is not a string that contains a path to the input directory.
+   * @throws {TypeError} When the path parameters are not a string that contains a path to a directory.
    * @since 1.0.0
    */
   constructor( inputPath, contentPath ) {
@@ -40,10 +39,6 @@ export default class ImportPhotos {
     this.contentPath = contentPath;
     this.exiftool = exiftool;
     this.importCache = new Map();
-
-    // Use the iconv library to "convert" the UTF-8 caption to ASCII.
-    // A workaround for this bug in hugo: https://github.com/gohugoio/hugo/issues/8079
-    this.iconv = new Iconv( "UTF-8", "ASCII//TRANSLIT//IGNORE" );
 
     // Basic validation of the input path.
     try {
@@ -96,14 +91,18 @@ export default class ImportPhotos {
     for ( const element of media ) {
       if ( element.media[ 0 ] !== undefined ) {
         let photo = element.media[ 0 ];
-        if ( photo.media_metadata.photo_metadata.latitude !== undefined ) {
-          if ( photo.media_metadata.photo_metadata.longitude !== undefined ) {
-            photo.gps = {
-              latitude: photo.media_metadata.photo_metadata.latitude,
-              longitude: photo.media_metadata.photo_metadata.longitude
-            };
+        if ( photo.media_metadata !== undefined ) {
+          if ( photo.media_metadata.photo_metadata !== undefined ) {
+            if ( photo.media_metadata.photo_metadata.latitude !== undefined ) {
+              if ( photo.media_metadata.photo_metadata.longitude !== undefined ) {
+                photo.gps = {
+                  latitude: photo.media_metadata.photo_metadata.latitude,
+                  longitude: photo.media_metadata.photo_metadata.longitude
+                };
 
-            delete photo.media_metadata;
+                delete photo.media_metadata;
+              }
+            }
           }
         }
         photoList.push( photo );
@@ -355,11 +354,13 @@ export default class ImportPhotos {
       subjectTags.push( ... hashTags );
     }
 
+    const imageDescription = this.decodeFacebookString( photo.title );
+
     const newTags = {
       AllDates: takenAt.toISO(),
-      "XMP-dc:Description": photo.title,
+      "XMP-dc:Description": imageDescription,
       "XMP-dc:Subject": subjectTags,
-      "ImageDescription": this.iconv.convert( photo.title ).toString()
+      "ImageDescription": imageDescription
     };
 
     if ( photo.gps !== undefined ) {
@@ -400,6 +401,30 @@ export default class ImportPhotos {
     photo.newPath = newPhotoPath;
 
     return photo;
+  }
+
+  /**
+   * Decode the weird Facebook encoding for UTF-8 based data.
+   *
+   * @param {string} input String to be decoded.
+   *
+   * @returns {string} A decoded string.
+   *
+   * @throws {TypeError} When the input parameter is not a string.
+   *
+   * @see {@link https://stackoverflow.com/a/54072481} for further information.
+   */
+  decodeFacebookString( input ) {
+
+    if ( !input || typeof input !== "string" ) {
+      throw new TypeError( "input parameter is required and must be a string" );
+    }
+
+    let arr = [];
+    for ( var i = 0; i < input.length; i++ ) {
+      arr.push( input.charCodeAt( i ) );
+    }
+    return Buffer.from( arr ).toString( "utf8" );
   }
 
   /**

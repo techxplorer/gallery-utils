@@ -41,7 +41,6 @@
     "exifr": "^6.1.1",
     "exiftool-vendored": "^14.0.0",
     "fast-glob": "^3.2.4",
-    "iconv": "^3.0.0",
     "log-symbols": "^4.0.0",
     "luxon": "^1.25.0",
     "pretty-ms": "^7.0.1"
