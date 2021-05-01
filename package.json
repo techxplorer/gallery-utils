@@ -29,7 +29,7 @@
     "eslint": "^7.16.0",
     "eslint-config-jquery": "^3.0.0",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsdoc": "^32.2.0",
+    "eslint-plugin-jsdoc": "^33.0.0",
     "eslint-plugin-mocha": "^8.0.0",
     "mocha": "^8.2.1",
     "rimraf": "^3.0.2"
@@ -41,7 +41,7 @@
     "exifr": "^6.1.1",
     "exiftool-vendored": "^14.0.0",
     "fast-glob": "^3.2.4",
-    "log-symbols": "^4.0.0",
+    "log-symbols": "^5.0.0",
     "luxon": "^1.25.0",
     "pretty-ms": "^7.0.1"
   }
