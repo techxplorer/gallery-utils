@@ -39,7 +39,7 @@
     "chalk": "^4.1.0",
     "commander": "^7.0.0",
     "exifr": "^6.1.1",
-    "exiftool-vendored": "^14.0.0",
+    "exiftool-vendored": "^14.3.0",
     "fast-glob": "^3.2.4",
     "log-symbols": "^5.0.0",
     "luxon": "^1.25.0",
